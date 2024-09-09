@@ -1,10 +1,12 @@
-import React from 'react'
+import {React,useState} from 'react'
 import { Link } from 'react-router-dom'
 import { Flex ,Box,Text} from '@chakra-ui/react'
 import { Avatar } from '@chakra-ui/react'
 import { Image } from '@chakra-ui/react'
 import { BsThreeDots } from 'react-icons/bs'
-const UserPost = () => {
+import Actions from './Actions'
+const UserPost = ({likes,replies,postImg,postTitle,time}) => {
+  const [liked, setLiked] = useState(false)
   return (
     <Link to={"/markzackerburg/post/1"}>
       <Flex gap={3} mb={4} py={5}>
@@ -48,16 +50,26 @@ const UserPost = () => {
                 <Image w={4} h={4} ml={1} src='/verified.png' />
               </Flex>
               <Flex gap={4} alignItems={"center"}>
-                <Text fontStyle={"sm"} color={"gray.light"}>1d</Text>
+                <Text fontStyle={"sm"} color={"gray.light"}>{time}</Text>
                 <BsThreeDots />
               </Flex>
             </Flex>
             <Text fontSize={"sm"}>
-              This is my first post on threads. I am so excited to be here.
+              {postTitle}
             </Text>
-            <Box borderRadius={6} border={"1px solid"} overflow={"hidden"} borderColor={"gray.light"}> 
-              <Image src='/post1.png' w={"full"} />
-            </Box>
+            {postImg &&(
+              <Box borderRadius={6} border={"1px solid"} overflow={"hidden"} borderColor={"gray.light"}> 
+              <Image src={postImg} w={"full"} />
+              </Box>
+          )}
+            <Flex gap={3} my={1}>
+              <Actions liked={liked} setLiked={setLiked}/>
+            </Flex>
+            <Flex gap={2} alignItems={"center"}>
+              <Text color={"gray.light"} fontSize={"sm"}>{replies}</Text>
+              <Box w={0.5} h={0.5} borderRadius={"full"} bg={"gray.light"}></Box>
+              <Text color={"gray.light"} fontSize={"sm"}>{likes}</Text>
+            </Flex>
         </Flex>
       </Flex>
     </Link>
