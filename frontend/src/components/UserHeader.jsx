@@ -1,13 +1,13 @@
 import {Box, VStack ,Flex ,Text,useToast , useColorModeValue , useColorMode} from '@chakra-ui/react'
 import { Link } from 'react-router-dom'
 import { Avatar } from '@chakra-ui/react'
-import React from 'react'
 import { BsInstagram } from 'react-icons/bs'
 import { CgMoreO } from 'react-icons/cg'
 import { Menu , MenuButton, MenuList,MenuItem } from '@chakra-ui/react'
 import { Portal } from '@chakra-ui/react'
 
-const UserHeader = ({user}) => {
+
+const UserHeader = () => {
     const toast = useToast()
     const { colorMode } = useColorMode();
     const copyURL = () => {
@@ -26,12 +26,12 @@ const UserHeader = ({user}) => {
     <VStack gap={4} alignItems={"start"}>
        <Flex justifyContent={'space-between'} w={("full")}>
         <Box>
-            <Text fontSize={"2xl"}>
-                Mark
+            <Text fontSize={{base:"lg" , md:"xl", lg:"2xl"}} mb={2}>
+                Mark Zuckerberg
             </Text>
             <Flex gap={2} alignItems={'center'}> 
-                <Text fontSize={'sm'} fontWeight={'bold'}>Mark</Text>
-                <Text fontSize={'xs'} bg={useColorModeValue('transparent', 'gray.dark')} color={"gray.light"} p={1} borderRadius={"full"} >
+                <Text fontSize={{base:"xs" , md:"sm", lg:"md"}} fontWeight={'bold'} >Mark_Zuckerberg</Text>
+                <Text fontSize={{base:"xs" , md:"sm", lg:"md"}} bg={useColorModeValue('transparent', 'gray.dark')} color={"gray.light"} p={1} borderRadius={"full"} >
                     threads.net
                 </Text>
             </Flex>
@@ -40,7 +40,10 @@ const UserHeader = ({user}) => {
             <Avatar 
             name={'Mark'}
             src="/zuck-avatar.png"
-            size={'xl'}
+            size={{
+                base:"lg",
+                md: "xl",
+            }}
             />
         </Box>
        </Flex>
