@@ -1,8 +1,8 @@
-import { Flex ,Avatar ,Text,Image,Box} from "@chakra-ui/react"
+import { Flex ,Avatar ,Text,Image,Box,Button,Divider} from "@chakra-ui/react"
 import { BsThreeDots } from 'react-icons/bs';
 import Actions from "../components/Actions";
 import { useState } from "react";
-
+import Comment from "../components/Comment";
 
 
 const PostPage = () => {
@@ -34,6 +34,20 @@ const PostPage = () => {
       <Box h={1} w={1} borderRadius={"full"} bg={"gray.light"}></Box>
       <Text color={"gary.light"} fontSize={"sm"}>{200 + (liked ? 1 : 0)} likes</Text>
     </Flex>
+    <Divider my={4}/>
+    <Flex justifyContent={"space-between"}>
+      <Flex alignItems={"center"} gap={2}>
+        <Text fontSize={"2xl"}>👋</Text>
+        <Text color={"gray.light"}>Get the app to like , reply and post.</Text>
+      </Flex>
+        <Button>
+          Get
+        </Button>
+    </Flex>
+    <Divider my={4}/>
+    <Comment likes={58} comment={"thank you gays "} day={"5h"} avatar={"/zuck-avatar.png"} name={"Mark"}/>
+    <Comment likes={50} comment={"u are a hero man"} day={"23h"} avatar={"https://bit.ly/prosper-baba"} name={"Snowy"}/>
+    <Comment likes={37} comment={"mete really prove a great thing"} day={"1d"} avatar={"https://bit.ly/kent-c-dodds"} name={"Kent Dodds"}/>
     </>
   )
 }
