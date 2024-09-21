@@ -1,6 +1,7 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
+import mongoose from "mongoose";
 
 // @desc    Get a user profile 
 const getProfileUser = async (req, res) => {
@@ -26,6 +27,11 @@ const signupUser = async (req, res) => {
 
         if (user) {
             return res.status(400).json({message: "User already exists"}); 
+        }
+
+        const minLength = 6;
+        if (password.length < minLength) {
+            return res.status(400).json({message: `Password must be at least ${minLength} characters long`});
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -86,8 +92,7 @@ const loginUser = async (req, res) => {
 // @desc    Logout a user
 const logoutUser = async (req, res) => {
     try {
-        
-        res.cookie("token", "", {maxAge: 1});
+        res.cookie("jwt", "", {maxAge: 1});
         res.status(200).json({message: "Logged out successfully"});
 
     } catch (err) {
@@ -100,6 +105,7 @@ const logoutUser = async (req, res) => {
 const followUnfollowUser = async (req, res) => {
     try {
         const {id} = req.params;
+        if(!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({message: "Invalid user ID"});
         const userToModify = await User.findById(id);
         const currentUser = await User.findById(req.user._id);
 
