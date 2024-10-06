@@ -2,6 +2,7 @@ import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
 import mongoose from "mongoose";
+import {v2 as cloudinary} from "cloudinary";
 
 // @desc    Get a user profile 
 const getProfileUser = async (req, res) => {
@@ -142,7 +143,8 @@ const followUnfollowUser = async (req, res) => {
 
 // @desc    Update a user
 const updateUser = async (req, res) => {   
-    const {name, email, username, password, confirm_password, profilePic, bio} = req.body;
+    const {name, email, username, password, confirm_password, bio} = req.body;
+    let {profilePic} = req.body;
     const userId = req.user._id;
 
     try {
@@ -162,12 +164,7 @@ const updateUser = async (req, res) => {
             user.password = hashedPassword;
         }
 
-        if(email) {
-            const emailExists = await User.findOne({email});
-            if (email === user.email) return res.status(400).json({error: "You already use this email"});
-            if (emailExists) return res.status(400).json({error: "Email already exists"});
-            user.email = email;
-        }
+        
 
         if(username) {
             const usernameExists = await User.findOne({username});
@@ -175,13 +172,30 @@ const updateUser = async (req, res) => {
             if (usernameExists) return res.status(400).json({error: "Username already exists"});
             user.username = username;
         }
+
+        if(email) {
+            const emailExists = await User.findOne({email});
+            if (email === user.email) return res.status(400).json({error: "You already use this email"});
+            if (emailExists) return res.status(400).json({error: "Email already exists"});
+            user.email = email;
+        }
+
+        if(profilePic) {
+            if(user.profilePic) {
+                await couldanry.uploader.destroy(user.profilePic.split("/").pop().split(".")[0]);
+            }
+            const uploadedResponse = await cloudinary.uploader.upload(profilePic)
+            user.profilePic = uploadedResponse.secure_url;
+        }
         
         user.name = name || user.name;
-        user.profilePic = profilePic || user.profilePic;
         user.bio = bio || user.bio;
         
         user = await user.save();
-        res.status(200).json({message: "Profile updated successfully",user});
+
+        user.password = null;
+
+        res.status(200).json(user);
         
         
     } catch (err) {
