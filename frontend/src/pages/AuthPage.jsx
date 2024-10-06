@@ -1,32 +1,26 @@
-import SignUpCard from '../components/SignUpCard'
-import LoginCard from '../components/LoginCard'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import authScreenAtom from '../atoms/authAtom'
-import { useEffect } from 'react'
+import SignUpCard from "../components/SignUpCard";
+import LoginCard from "../components/LoginCard";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import authScreenAtom from "../atoms/authAtom";
+import { useEffect } from "react";
 const AuthPage = () => {
-  const authScreenState = useRecoilValue(authScreenAtom)
-  const setAuthScreenState = useSetRecoilState(authScreenAtom)
-
+  const authScreenState = useRecoilValue(authScreenAtom);
+  const setAuthscreenState = useSetRecoilState(authScreenAtom);
+  console.log(authScreenState);
   useEffect(() => {
-    const screen = localStorage.getItem('authScreen')
+    const screen = localStorage.getItem("authScreen");
     if (screen) {
-      setAuthScreenState(screen)
+      setAuthscreenState(screen);
     } else {
-      setAuthScreenState("login")
+      setAuthscreenState("login");
     }
-    
-  },[setAuthScreenState])
-   
+  }, [setAuthscreenState]);
+
   useEffect(() => {
-    localStorage.setItem('authScreen', authScreenState)
-  },[authScreenState])
+    localStorage.setItem("authScreen", authScreenState);
+  }, [authScreenState]);
 
-  
-  return (
-    <>
-        {authScreenState === 'login' ? <LoginCard /> : <SignUpCard />}
-    </>
-  )
-}
+  return <>{authScreenState === "login" ? <LoginCard /> : <SignUpCard />}</>;
+};
 
-export default AuthPage
+export default AuthPage;
