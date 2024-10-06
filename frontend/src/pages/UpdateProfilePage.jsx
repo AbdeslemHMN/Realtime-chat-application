@@ -12,6 +12,8 @@ const UpdateProfilePage = () => {
  
   const [user , setUser] = useRecoilState(userAtom)
 
+  const [updating, setUpdating] = useState(false)
+
   const toast = useShowToast()
 
   const [inputs, setInputs] = useState({
@@ -20,41 +22,46 @@ const UpdateProfilePage = () => {
     email: user.email,
     password: '',
     confirm_password: '',
-    profilePic: "",
     bio: user.bio
   })
 
-  const fileRef = useRef( null )
+  const fileRef = useRef(null)
+
   const {handleImageChange , imgUrl} = usePrevImg()
 
-  const handleChange = async () => {
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    if(updating) return;
+    setUpdating(true)
     try {
-      const res = await fetch('/api/users/update/${user._id}', {
-        method : "PUT",
+      const res = await fetch(`/api/users/update/${user._id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(inputs)
+        body: JSON.stringify({...inputs, profilePic: imgUrl})
       })
       const data = await res.json()
-
-      if(data.error) {
-        toast("An error occurred.", data.error, "error")
+      if (data.error) {
+        toast("Error", data.error, "error")
         return ;
       }
-      toast("Profile updated.", "Your profile has been updated.", "success")
       localStorage.setItem('user', JSON.stringify(data))
       setUser(data)
-      
+      toast("Success", "Profile updated successfully", "success")
     } catch (err) {
-      toast("An error occurred.", err.message, "error")
+      toast("Error", err.message, "error")
       console.log(err)
-      
+    } finally {
+      setUpdating(false)
     }
   }
 
+  
+
 
   return (
+    <form onSubmit={handleSubmit}>
     <Flex
       align={'center'}
       justify={'center'}
@@ -72,18 +79,18 @@ const UpdateProfilePage = () => {
         <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
           Edit Your Profile
         </Heading>
-        <FormControl id="userName">
+        <FormControl id="profilePic">
           <Stack direction={['column', 'row']} spacing={6}>
             <Center>
-              <Avatar size="xl" boxShadow={"md"} src={user.profilePic} /> 
+              <Avatar size="xl" boxShadow={"md"} src={imgUrl || user.profilePic} /> 
             </Center>
             <Center w="full">
               <Button w="full" onClick={() => fileRef.current.click()}>Edit picture</Button>
-              <Input type='file' hidden ref={fileRef} onChange={handleImageChange} accept="image/*"/>
+              <Input type='file' hidden ref={fileRef} onChange={handleImageChange}/>
             </Center>
           </Stack>
         </FormControl>
-        <FormControl id="name" isRequired>
+        <FormControl id="name">
           <FormLabel>name</FormLabel>
           <Input
             placeholder={user.name || "name"}
@@ -93,17 +100,17 @@ const UpdateProfilePage = () => {
             onChange = {(e) => setInputs({...inputs, name: e.target.value})}
           />
         </FormControl>
-        <FormControl id="userName" isRequired>
+        <FormControl id="userName">
           <FormLabel>User name</FormLabel>
           <Input
-            placeholder={user.username || "username"}
+            placeholder={user.username||"username"}
             _placeholder={{ color: 'gray.500' }}
             type="text"
             value={inputs.username}
             onChange = {(e) => setInputs({...inputs, username: e.target.value})}
           />
         </FormControl>
-        <FormControl id="email" isRequired>
+        <FormControl id="email">
           <FormLabel>Email address</FormLabel>
           <Input
             placeholder={user.email || "email"}
@@ -113,7 +120,7 @@ const UpdateProfilePage = () => {
             onChange = {(e) => setInputs({...inputs, email: e.target.value})}
           />
         </FormControl>
-        <FormControl id="bio" isRequired>
+        <FormControl id="bio">
           <FormLabel>bio</FormLabel>
           <Input
             placeholder={user.bio || "bio"}
@@ -123,7 +130,7 @@ const UpdateProfilePage = () => {
             onChange = {(e) => setInputs({...inputs, bio: e.target.value})}
           />
         </FormControl>
-        <FormControl id="password" isRequired>
+        <FormControl id="password">
           <FormLabel>Password</FormLabel>
           <InputGroup>
           <Input type={showPassword ? 'text' : 'password'} 
@@ -140,7 +147,7 @@ const UpdateProfilePage = () => {
               </InputRightElement>
               </InputGroup> 
         </FormControl>
-        <FormControl id="confirm_password" isRequired>
+        <FormControl id="confirm_password">
           <FormLabel>Confirm Password</FormLabel>
           <InputGroup>
           <Input type={showPassword ? 'text' : 'password'} 
@@ -174,13 +181,14 @@ const UpdateProfilePage = () => {
             _hover={{
               bg: 'blue.500',
             }}
-            onClick = {handleChange}
+            type="submit"
             >
             Submit
           </Button>
         </Stack>
       </Stack>
     </Flex>
+    </form>
   )
 }
 
