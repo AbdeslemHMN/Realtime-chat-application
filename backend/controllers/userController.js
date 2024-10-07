@@ -2,7 +2,7 @@ import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
 import mongoose from "mongoose";
-import {v2 as cloudinary} from "cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 
 // @desc    Get a user profile 
 const getProfileUser = async (req, res) => {
@@ -182,14 +182,15 @@ const updateUser = async (req, res) => {
 
         if(profilePic) {
             if(user.profilePic) {
-                await couldanry.uploader.destroy(user.profilePic.split("/").pop().split(".")[0]);
+                await cloudinary.uploader.destroy(user.profilePic.split("/").pop().split(".")[0]);
             }
             const uploadedResponse = await cloudinary.uploader.upload(profilePic)
-            user.profilePic = uploadedResponse.secure_url;
+            profilePic = uploadedResponse.secure_url;
         }
         
         user.name = name || user.name;
         user.bio = bio || user.bio;
+        user.profilePic = profilePic|| user.profilePic
         
         user = await user.save();
 
