@@ -12,6 +12,7 @@ import {
   InputGroup,
   InputRightElement,
 } from "@chakra-ui/react";
+import { Checkbox, CheckboxGroup } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useRef, useState } from "react";
 import { useRecoilState } from "recoil";
@@ -44,6 +45,25 @@ const UpdateProfilePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (updating) return;
+    // Build a payload with only the fields that have been changed
+    let updatedFields = {};
+    if (inputs.name !== user.name) updatedFields.name = inputs.name;
+    if (inputs.username !== user.username) updatedFields.username = inputs.username;
+    if (inputs.email !== user.email) updatedFields.email = inputs.email;
+    if (inputs.bio !== user.bio) updatedFields.bio = inputs.bio;
+    if (inputs.password && inputs.password === inputs.confirm_password) {
+      updatedFields.password = inputs.password;
+    }
+
+    // If there is a new profile picture
+    if (imgUrl) updatedFields.profilePic = imgUrl;
+
+    // If no fields were changed, show a message and return
+    if (Object.keys(updatedFields).length === 0) {
+      toast("Info", "No changes made to the profile", "info");
+      return;
+    }
+    
     setUpdating(true);
     try {
       const res = await fetch(`/api/users/update/${user._id}`, {
@@ -51,7 +71,7 @@ const UpdateProfilePage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...inputs, profilePic: imgUrl }),
+        body: JSON.stringify(updatedFields),
       });
       const data = await res.json();
       if (data.error) {
@@ -70,6 +90,7 @@ const UpdateProfilePage = () => {
   };
 
   return (
+    <>
     <form onSubmit={handleSubmit}>
       <Flex align={"center"} justify={"center"} my={6}>
         <Stack
@@ -214,13 +235,15 @@ const UpdateProfilePage = () => {
                 bg: "blue.500",
               }}
               type="submit"
+              disabled={updating}
             >
-              Submit
+              {updating ? 'Updating...' : 'Update Profile'}
             </Button>
           </Stack>
         </Stack>
       </Flex>
     </form>
+     </>
   );
 };
 
