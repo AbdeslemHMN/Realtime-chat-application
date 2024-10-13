@@ -15,7 +15,6 @@ const getProfileUser = async (req, res) => {
 
    } catch (err) {
        res.status(500).json({ error: err.message });
-       console.log("Error in profileUser: ", err.message);
    } ;
 } ;
 
@@ -66,7 +65,6 @@ const signupUser = async (req, res) => {
 
     } catch (err) {
         res.status(500).json({ error: err.message });
-        console.log("Error in signupUser: ", err.message);
     }
 };
 
@@ -92,7 +90,6 @@ const loginUser = async (req, res) => {
 
     } catch (err) {
         res.status(500).json({ error: err.message });
-        console.log("Error in loginUser: ", err.message);
     }
 };
 
@@ -104,7 +101,6 @@ const logoutUser = async (req, res) => {
 
     } catch (err) {
         res.status(500).json({ error: err.message });
-        console.log("Error in logoutUser: ", err.message);
     }
 };  
 
@@ -153,12 +149,12 @@ const updateUser = async (req, res) => {
 
         if(req.params.id !== userId.toString()) return res.status(400).json({error: "You can only update your profile"});
         
-        if (password) {
+        if (password && confirm_password) {
             const minLength = 6;
             
             if (password.length < minLength) return res.status(400).json({error: `Password must be at least ${minLength} characters long`});
             
-            if (password !== confirm_password) return res.status(400).json({error: "Passwords do not match"});
+            if (password !== confirm_password) return res.status(400).json({error: "Passwords do not match"},password,confirm_password);
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
             user.password = hashedPassword;
@@ -201,7 +197,6 @@ const updateUser = async (req, res) => {
         
     } catch (err) {
         res.status(500).json({ error: err.message });
-        console.log("Error in updateUser: ", err.message);
     } ; 
 } ;
 

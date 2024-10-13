@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Button , Container } from '@chakra-ui/react'
+import {Container } from '@chakra-ui/react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import UserPage  from './pages/UserPage'
 import PostPage  from './pages/PostPage'
@@ -8,14 +7,11 @@ import HomePage from './pages/HomePage'
 import AuthPage from './pages/AuthPage'
 import { useRecoilValue } from 'recoil'
 import userAtom from './atoms/userAtom'
-import LogouButton from './components/LogoutButton'
-import UpdateButton from './components/UpdateButton'
 import UpdateProfilePage  from './pages/UpdateProfilePage'
 
 
 function App() {
   const user = useRecoilValue(userAtom)
-  console.log(user)
   return (
     <Container maxW='620px'>
       <Header />

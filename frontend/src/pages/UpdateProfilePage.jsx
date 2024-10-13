@@ -12,7 +12,6 @@ import {
   InputGroup,
   InputRightElement,
 } from "@chakra-ui/react";
-import { Checkbox, CheckboxGroup } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useRef, useState } from "react";
 import { useRecoilState } from "recoil";
@@ -51,15 +50,14 @@ const UpdateProfilePage = () => {
     if (inputs.username !== user.username) updatedFields.username = inputs.username;
     if (inputs.email !== user.email) updatedFields.email = inputs.email;
     if (inputs.bio !== user.bio) updatedFields.bio = inputs.bio;
-    if (inputs.password && inputs.password === inputs.confirm_password) {
-      updatedFields.password = inputs.password;
-    }
+    if (inputs.password) updatedFields.password = inputs.password;
+    if (inputs.confirm_password) updatedFields.confirm_password = inputs.confirm_password;
 
     // If there is a new profile picture
     if (imgUrl) updatedFields.profilePic = imgUrl;
 
     // If no fields were changed, show a message and return
-    if (Object.keys(updatedFields).length === 0) {
+    if (Object.keys(updatedFields).length === 0 ) {
       toast("Info", "No changes made to the profile", "info");
       return;
     }
@@ -88,6 +86,7 @@ const UpdateProfilePage = () => {
       setUpdating(false);
     }
   };
+
 
   return (
     <>
@@ -224,6 +223,7 @@ const UpdateProfilePage = () => {
               _hover={{
                 bg: "red.500",
               }}
+              onClick={() => window.history.back()}
             >
               Cancel
             </Button>
@@ -235,7 +235,8 @@ const UpdateProfilePage = () => {
                 bg: "blue.500",
               }}
               type="submit"
-              disabled={updating}
+              // disabled={updating}
+              isLoading={updating}
             >
               {updating ? 'Updating...' : 'Update Profile'}
             </Button>

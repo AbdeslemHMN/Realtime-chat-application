@@ -6,7 +6,6 @@ import { useEffect } from "react";
 const AuthPage = () => {
   const authScreenState = useRecoilValue(authScreenAtom);
   const setAuthscreenState = useSetRecoilState(authScreenAtom);
-  console.log(authScreenState);
   useEffect(() => {
     const screen = localStorage.getItem("authScreen");
     if (screen) {

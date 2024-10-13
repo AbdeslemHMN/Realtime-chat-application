@@ -146,7 +146,7 @@ const getFeedPost = async (req, res) => {
 
         const feedPosts = await Post.find({postedBy: { $in : following }}).sort({ createdAt: -1 });
 
-        res.status(200).json({ feedPosts });
+        res.status(200).json(feedPosts );
         
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -156,14 +156,14 @@ const getFeedPost = async (req, res) => {
 
 // @desc Get user post
 const getUserPost = async (req, res) => {
+    const {username} = req.params;
     try {
-        const {username} = req.params;
         const user = await User.findOne({username});
         if(!user) return res.status(404).json({ error: "User not found" });
 
         const posts = await Post.find({postedBy: user._id}).sort({ createdAt: -1 });
 
-        res.status(200).json({ posts });
+        res.status(200).json(posts);
     } catch (err) {
         res.status(500).json({ error: err.message });
         console.log("Error in getUserPost: ", err.message);
