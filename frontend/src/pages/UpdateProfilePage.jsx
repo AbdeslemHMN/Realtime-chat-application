@@ -53,6 +53,20 @@ const UpdateProfilePage = () => {
         },
         body: JSON.stringify({ ...inputs, profilePic: imgUrl }),
       });
+      if (!res.ok) {
+        let contentType = res.headers.get("Content-Type")
+        // Try to extract error data (assuming the response may contain error text instead of JSON)
+        let errorData;
+        if (contentType && contentType.includes("application/json")) {
+          errorData = await res.json(); // Parse error as JSON
+        } else {
+          errorData = await res.text(); // Fallback to parsing as text (HTML or plain text)
+        }
+
+        console.log("Error response:", errorData); // Log the error data for debugging
+        toast("Error", `Failed to update profile: ${errorData}`, "error"); // Show error toast
+        return;
+      }
       const data = await res.json();
       if (data.error) {
         toast("Error", data.error, "error");

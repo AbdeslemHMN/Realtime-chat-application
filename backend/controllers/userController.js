@@ -142,68 +142,138 @@ const followUnfollowUser = async (req, res) => {
 };
 
 // @desc    Update a user
-const updateUser = async (req, res) => {   
-    const {name, email, username, password, confirm_password, bio} = req.body;
-    let {profilePic} = req.body;
+// const updateUser = async (req, res) => {
+//     const {name, email, username, password, confirm_password, bio} = req.body;
+//     let {profilePic} = req.body;
+//     const userId = req.user._id;
+
+//     try {
+//         let user = await User.findById(userId);
+//         if (!user) return res.status(400).json({error: "User not found"});
+
+//         if(req.params.id !== userId.toString()) return res.status(400).json({error: "You can only update your profile"});
+        
+//         if (password) {
+//             const minLength = 6;
+            
+//             if (password.length < minLength) return res.status(400).json({error: `Password must be at least ${minLength} characters long`});
+            
+//             if (password !== confirm_password) return res.status(400).json({error: "Passwords do not match"});
+//             const salt = await bcrypt.genSalt(10);
+//             const hashedPassword = await bcrypt.hash(password, salt);
+//             user.password = hashedPassword;
+//         }
+
+//         if(username) {
+//             const usernameExists = await User.findOne({username});
+//             if (username === user.username) return res.status(400).json({error: "You already use this username"});
+//             if (usernameExists) return res.status(400).json({error: "Username already exists"});
+//             user.username = username;
+//         }
+
+//         if(email) {
+//             const emailExists = await User.findOne({email});
+//             if (email === user.email) return res.status(400).json({error: "You already use this email"});
+//             if (emailExists) return res.status(400).json({error: "Email already exists"});
+//             user.email = email;
+//         }
+
+//         if(profilePic) {
+//             if(user.profilePic) {
+//                 await cloudinary.uploader.destroy(user.profilePic.split("/").pop().split(".")[0]);
+//             }
+//             const uploadedResponse = await cloudinary.uploader.upload(profilePic)
+//             profilePic = uploadedResponse.secure_url;
+//         }
+        
+//         user.name = name || user.name;
+//         user.bio = bio || user.bio;
+//         user.profilePic = profilePic|| user.profilePic
+        
+//         user = await user.save();
+
+//         user.password = null;
+
+//         res.status(200).json(user);
+        
+        
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//         console.log("Error in updateUser: ", err.message);
+//     } ;
+// } ;
+
+// @desc new update user i should understand it before integrate it in my code
+
+const updateUser = async (req, res) => {
+    const { name, email, username, password, confirm_password, bio } = req.body;
+    let { profilePic } = req.body;
     const userId = req.user._id;
 
     try {
-        let user = await User.findById(userId);
-        if (!user) return res.status(400).json({error: "User not found"});
-
-        if(req.params.id !== userId.toString()) return res.status(400).json({error: "You can only update your profile"});
+        // Fetch the user only once
+        const user = await User.findById(userId);
+        if (!user) return res.status(400).json({ error: "User not found" });
         
+        if (req.params.id !== userId.toString()) {
+            return res.status(400).json({ error: "You can only update your profile" });
+        }
+
+        const updates = {};
+        const promises = [];
+
+        // Password update
         if (password) {
             const minLength = 6;
-            
-            if (password.length < minLength) return res.status(400).json({error: `Password must be at least ${minLength} characters long`});
-            
-            if (password !== confirm_password) return res.status(400).json({error: "Passwords do not match"});
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(password, salt);
-            user.password = hashedPassword;
+            if (password.length < minLength) return res.status(400).json({ error: `Password must be at least ${minLength} characters long` });
+            if (password !== confirm_password) return res.status(400).json({ error: "Passwords do not match" });
+            promises.push(bcrypt.hash(password, await bcrypt.genSalt(10)).then(hashedPassword => updates.password = hashedPassword));
         }
 
-        
-
-        if(username) {
-            const usernameExists = await User.findOne({username});
-            if (username === user.username) return res.status(400).json({error: "You already use this username"});
-            if (usernameExists) return res.status(400).json({error: "Username already exists"});
-            user.username = username;
+        // Username and email checks
+        if (username && username !== user.username) {
+            promises.push(User.findOne({ username }).then(existingUser => {
+                if (existingUser) throw new Error("Username already exists");
+                updates.username = username;
+            }));
         }
 
-        if(email) {
-            const emailExists = await User.findOne({email});
-            if (email === user.email) return res.status(400).json({error: "You already use this email"});
-            if (emailExists) return res.status(400).json({error: "Email already exists"});
-            user.email = email;
+        if (email && email !== user.email) {
+            promises.push(User.findOne({ email }).then(existingEmail => {
+                if (existingEmail) throw new Error("Email already exists");
+                updates.email = email;
+            }));
         }
 
-        if(profilePic) {
-            if(user.profilePic) {
-                await cloudinary.uploader.destroy(user.profilePic.split("/").pop().split(".")[0]);
+        // Profile picture handling
+        if (profilePic) {
+            if (user.profilePic) {
+                promises.push(cloudinary.uploader.destroy(user.profilePic.split("/").pop().split(".")[0]));
             }
-            const uploadedResponse = await cloudinary.uploader.upload(profilePic)
-            profilePic = uploadedResponse.secure_url;
+            promises.push(cloudinary.uploader.upload(profilePic).then(uploadedResponse => {
+                updates.profilePic = uploadedResponse.secure_url;
+            }));
         }
-        
-        user.name = name || user.name;
-        user.bio = bio || user.bio;
-        user.profilePic = profilePic|| user.profilePic
-        
-        user = await user.save();
 
-        user.password = null;
+        // Await all promises
+        await Promise.all(promises);
 
-        res.status(200).json(user);
-        
+        // Apply updates
+        updates.name = name || user.name;
+        updates.bio = bio || user.bio;
+        Object.assign(user, updates);
+
+        const updatedUser = await user.save();
+        updatedUser.password = null;
+
+        res.status(200).json(updatedUser);
         
     } catch (err) {
+        console.error("Error in updateUser: ", err.message);
         res.status(500).json({ error: err.message });
-        console.log("Error in updateUser: ", err.message);
-    } ; 
-} ;
+    }
+};
+
 
 
 export { signupUser , loginUser, logoutUser, followUnfollowUser , updateUser , getProfileUser };
