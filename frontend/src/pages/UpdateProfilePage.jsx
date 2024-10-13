@@ -44,6 +44,24 @@ const UpdateProfilePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (updating) return;
+    // Build a payload with only the fields that have been changed
+    let updatedFields = {};
+    if (inputs.name !== user.name) updatedFields.name = inputs.name;
+    if (inputs.username !== user.username) updatedFields.username = inputs.username;
+    if (inputs.email !== user.email) updatedFields.email = inputs.email;
+    if (inputs.bio !== user.bio) updatedFields.bio = inputs.bio;
+    if (inputs.password) updatedFields.password = inputs.password;
+    if (inputs.confirm_password) updatedFields.confirm_password = inputs.confirm_password;
+
+    // If there is a new profile picture
+    if (imgUrl) updatedFields.profilePic = imgUrl;
+
+    // If no fields were changed, show a message and return
+    if (Object.keys(updatedFields).length === 0 ) {
+      toast("Info", "No changes made to the profile", "info");
+      return;
+    }
+    
     setUpdating(true);
     try {
       const res = await fetch(`/api/users/update/${user._id}`, {
@@ -51,7 +69,7 @@ const UpdateProfilePage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...inputs, profilePic: imgUrl }),
+        body: JSON.stringify(updatedFields),
       });
       if (!res.ok) {
         let contentType = res.headers.get("Content-Type")
@@ -83,7 +101,9 @@ const UpdateProfilePage = () => {
     }
   };
 
+
   return (
+    <>
     <form onSubmit={handleSubmit}>
       <Flex align={"center"} justify={"center"} my={6}>
         <Stack
@@ -217,6 +237,7 @@ const UpdateProfilePage = () => {
               _hover={{
                 bg: "red.500",
               }}
+              onClick={() => window.history.back()}
             >
               Cancel
             </Button>
@@ -228,13 +249,16 @@ const UpdateProfilePage = () => {
                 bg: "blue.500",
               }}
               type="submit"
+              // disabled={updating}
+              isLoading={updating}
             >
-              Submit
+              {updating ? 'Updating...' : 'Update Profile'}
             </Button>
           </Stack>
         </Stack>
       </Flex>
     </form>
+     </>
   );
 };
 
