@@ -1,18 +1,17 @@
-import {Container } from '@chakra-ui/react'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import UserPage  from './pages/UserPage'
-import PostPage  from './pages/PostPage'
-import { Header } from './components/Header'
-import HomePage from './pages/HomePage'
-import AuthPage from './pages/AuthPage'
-import { useRecoilValue } from 'recoil'
-import userAtom from './atoms/userAtom'
-import UpdateProfilePage from './pages/UpdateProfilePage'
-import Error404 from './pages/Error404'
-
+import { Container } from "@chakra-ui/react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import UserPage from "./pages/UserPage";
+import PostPage from "./pages/PostPage";
+import { Header } from "./components/Header";
+import HomePage from "./pages/HomePage";
+import AuthPage from "./pages/AuthPage";
+import { useRecoilValue } from "recoil";
+import userAtom from "./atoms/userAtom";
+import UpdateProfilePage from "./pages/UpdateProfilePage";
+import Error404 from "./pages/Error404";
 
 function App() {
-  const user = useRecoilValue(userAtom)
+  const user = useRecoilValue(userAtom);
   return (
     <Container maxW="620px">
       <Header />
@@ -30,13 +29,13 @@ function App() {
           element={user ? <UpdateProfilePage /> : <Navigate to="/auth" />}
         />
         <Route
-          path="/:username"
-          element={user ? <UserPage /> : <Navigate to="/auth" />}
+          path="/profile/:username"
+          element={<UserPage />}
         />
         <Route path="/:username/post/:pid" element={<PostPage />} />
         <Route path="/*" element={<Error404 />} />
       </Routes>
     </Container>
-  );       
+  );
 }
-export default App
+export default App;

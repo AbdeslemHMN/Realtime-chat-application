@@ -1,4 +1,3 @@
-
 import { Box, Heading, Text, Button } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
@@ -20,7 +19,7 @@ export default function Error404() {
       <Text color={"gray.500"} mb={6}>
         The page you&apos;re looking for does not seem to exist
       </Text>
-      <Link to = {'/'}>
+      <Link to={"/"}>
         <Button
           colorScheme="teal"
           bgGradient="linear(to-r, teal.400, teal.500, teal.600)"

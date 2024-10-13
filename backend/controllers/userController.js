@@ -137,67 +137,7 @@ const followUnfollowUser = async (req, res) => {
     }
 };
 
-// @desc    Update a user
-// const updateUser = async (req, res) => {
-//     const {name, email, username, password, confirm_password, bio} = req.body;
-//     let {profilePic} = req.body;
-//     const userId = req.user._id;
 
-//     try {
-//         let user = await User.findById(userId);
-//         if (!user) return res.status(400).json({error: "User not found"});
-
-//         if(req.params.id !== userId.toString()) return res.status(400).json({error: "You can only update your profile"});
-        
-//         if (password) {
-//             const minLength = 6;
-            
-//             if (password.length < minLength) return res.status(400).json({error: `Password must be at least ${minLength} characters long`});
-            
-//             if (password !== confirm_password) return res.status(400).json({error: "Passwords do not match"});
-//             const salt = await bcrypt.genSalt(10);
-//             const hashedPassword = await bcrypt.hash(password, salt);
-//             user.password = hashedPassword;
-//         }
-
-//         if(username) {
-//             const usernameExists = await User.findOne({username});
-//             if (username === user.username) return res.status(400).json({error: "You already use this username"});
-//             if (usernameExists) return res.status(400).json({error: "Username already exists"});
-//             user.username = username;
-//         }
-
-//         if(email) {
-//             const emailExists = await User.findOne({email});
-//             if (email === user.email) return res.status(400).json({error: "You already use this email"});
-//             if (emailExists) return res.status(400).json({error: "Email already exists"});
-//             user.email = email;
-//         }
-
-//         if(profilePic) {
-//             if(user.profilePic) {
-//                 await cloudinary.uploader.destroy(user.profilePic.split("/").pop().split(".")[0]);
-//             }
-//             const uploadedResponse = await cloudinary.uploader.upload(profilePic)
-//             profilePic = uploadedResponse.secure_url;
-//         }
-        
-//         user.name = name || user.name;
-//         user.bio = bio || user.bio;
-//         user.profilePic = profilePic|| user.profilePic
-        
-//         user = await user.save();
-
-//         user.password = null;
-
-//         res.status(200).json(user);
-        
-        
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//         console.log("Error in updateUser: ", err.message);
-//     } ;
-// } ;
 
 // @desc new update user i should understand it before integrate it in my code
 

@@ -6,7 +6,7 @@ import UpdateButton from "../components/UpdateButton";
 const HomePage = () => {
   return (
     <>
-    <Link to={"Markzuckerburg"}>
+    <Link to={"/profile/abdou"}>
       <Flex w={"full"} justifyContent={"center"}>
         <Button mx={"auto"}>Visit Profile Page</Button>
       </Flex>

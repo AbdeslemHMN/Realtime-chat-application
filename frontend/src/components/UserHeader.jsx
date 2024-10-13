@@ -15,11 +15,13 @@ import { CgMoreO } from "react-icons/cg";
 import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
 import { Portal } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
+import useFollowUnfollow from "../hooks/useFollowUnfollow";
 import userAtom from "./../atoms/userAtom";
 
 const UserHeader = ({ user }) => {
   const toast = useToast();
   const currentUser = useRecoilValue(userAtom);
+  const { handleFollowUnfollow, updating, following } = useFollowUnfollow(user);
 
   const { colorMode } = useColorMode();
   const copyURL = () => {
@@ -75,7 +77,7 @@ const UserHeader = ({ user }) => {
         </Box>
       </Flex>
       <Text>{user.bio}</Text>
-      {currentUser._id === user._id && (
+      {currentUser?._id === user._id && (
         <RouterLink to={"/update"}>
           <Box boxShadow="md" rounded="md">
             <Button size={"lg"} borderRadius={"10"}>
@@ -85,15 +87,18 @@ const UserHeader = ({ user }) => {
         </RouterLink>
       )}
 
-      {currentUser._id !== user._id && (
+      {currentUser?._id !== user._id && (
         <Flex alignItems={"center"} gap={2}>
-          <RouterLink to={"/"}>
-            <Box boxShadow="md" rounded="md">
-              <Button size={"lg"} borderRadius={"10"}>
-                <Text fontSize={"sm"}>Follow</Text>
-              </Button>
-            </Box>
-          </RouterLink>
+          <Box boxShadow="md" rounded="md">
+            <Button
+              size={"lg"}
+              borderRadius={"10"}
+              onClick={handleFollowUnfollow}
+              isLoading={updating}
+            >
+              <Text fontSize={"sm"}>{following ? "Unfollow" : "Follow"}</Text>
+            </Button>
+          </Box>
           <RouterLink to={"/"}>
             <Box boxShadow="md" rounded="md">
               <Button size={"lg"} borderRadius={"10"}>
