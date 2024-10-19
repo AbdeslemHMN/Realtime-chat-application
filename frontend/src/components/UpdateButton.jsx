@@ -1,7 +1,7 @@
 import { Button , Flex} from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
-const LogoutButton = () => {
+const UpdateButton = () => {
     return (
         <Link to={"update"}>
             <Flex w={"full"} justifyContent={"center"} mt={3}>
@@ -11,4 +11,4 @@ const LogoutButton = () => {
 );
 };
 
-export default LogoutButton;
+export default UpdateButton;

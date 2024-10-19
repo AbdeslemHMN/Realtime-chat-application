@@ -8,6 +8,7 @@ import AuthPage from "./pages/AuthPage";
 import { useRecoilValue } from "recoil";
 import userAtom from "./atoms/userAtom";
 import UpdateProfilePage from "./pages/UpdateProfilePage";
+import CreatePost from "./components/CreatePost";
 import Error404 from "./pages/Error404";
 
 function App() {
@@ -35,6 +36,8 @@ function App() {
         <Route path="/:username/post/:pid" element={<PostPage />} />
         <Route path="/*" element={<Error404 />} />
       </Routes>
+
+      {user && <CreatePost />}
     </Container>
   );
 }

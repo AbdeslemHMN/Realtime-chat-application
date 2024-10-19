@@ -21,7 +21,6 @@ const UserPage = () => {
         const data = await res.json()
         if (data.error) {
           toast("Error" , data.error , "error")
-          console.log(data.error)
           return
         }
         setUser(data)

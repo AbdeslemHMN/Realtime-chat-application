@@ -17,7 +17,6 @@ const LogoutButton = () => {
                 }
               })
               const data = await res.json()
-              console.log(data)
               if (data.error) {
                toast("An error occurred.", data.error, "error")
                   return ;
@@ -28,7 +27,6 @@ const LogoutButton = () => {
             
         } catch (err) {
           toast("An error occurred.", err.message, "error")
-          console.log(err)
         }
     }
   return (

@@ -82,7 +82,7 @@ const UpdateProfilePage = () => {
         }
 
         console.log("Error response:", errorData); // Log the error data for debugging
-        toast("Error", `Failed to update profile: ${errorData}`, "error"); // Show error toast
+        toast("Error", `Error: ${errorData.error}`, "error"); // Show error toast
         return;
       }
       const data = await res.json();
