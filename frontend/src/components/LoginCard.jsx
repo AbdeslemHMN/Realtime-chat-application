@@ -18,6 +18,8 @@ import useShowToast from '../hooks/useShowToast'
     const toast = useShowToast()
 
     const handleLogin = async () => {
+      if (loading) return
+      setLoading(true) ;
       try {
         const res = await fetch('/api/users/login', {
           method : "POST",
@@ -37,9 +39,11 @@ import useShowToast from '../hooks/useShowToast'
       } catch (err) {
         toast("An error occurred.", err.message, "error")
         console.log(err)       
+      } finally {
+        setLoading(false)
       }
     }
-  
+
     return (
       <Flex
         align={'center'}
@@ -89,7 +93,7 @@ import useShowToast from '../hooks/useShowToast'
               </FormControl>
               <Stack spacing={10} pt={2}>
                 <Button
-                  loadingText="Submitting"
+                  loadingText="Logging in"
                   size="lg"
                   bg={useColorModeValue('gray.600', 'gray.700')}
                   color={'white'}
@@ -97,6 +101,7 @@ import useShowToast from '../hooks/useShowToast'
                     bg: useColorModeValue('gray.700', 'gray.800'),
                   }}
                   onClick={handleLogin}
+                  isLoading={loading}
                   >
                   Login
                 </Button>

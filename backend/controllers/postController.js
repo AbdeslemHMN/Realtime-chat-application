@@ -1,12 +1,15 @@
 import  Post from "../models/postModel.js";
 import User from "../models/userModel.js";
 import mongoose from "mongoose";
+import { v2 as cloudinary } from "cloudinary";
 
 
 // @desc Create a new post
 const createPost = async (req, res) => {
     try {
-        const {postedBy, text, img} = req.body;
+        const postedBy = req.user._id;
+        const {text} = req.body;
+        let {img} = req.body;
         if (!postedBy || !text) return res.status(400).json({ error: "PostedBy and text field are required" });
         const user = await User.findById(postedBy);
         if (!user) return res.status(404).json({ error: "User not found" });
@@ -17,12 +20,17 @@ const createPost = async (req, res) => {
 
         if (text.length > maxPostLength) return res.status(400).json({ error: `Post text must be less than ${maxPostLength} characters` });
 
+        if(img) {
+            const uploadedResponse = await cloudinary.uploader.upload(img)
+            img = uploadedResponse.secure_url;
+        }
+
         const newPost = new Post({ postedBy, text, img });
 
         await newPost.save();
 
         if (newPost) {
-            res.status(201).json({ message: "Post created successfully", post: newPost });
+            res.status(201).json(newPost);
         } else {
             res.status(400).json({ error: "Invalid post data" });
         }
@@ -40,7 +48,7 @@ const getPost = async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid post ID" });
         const post = await Post.findById(id);
         if (!post) return res.status(404).json({ error: "Post not found" });
-        res.status(200).json({ post });
+        res.status(200).json( post );
         
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -59,6 +67,11 @@ const deletePost = async (req, res) => {
         if (!post) return res.status(404).json({ error: "Post not found" });
 
         if (post.postedBy.toString() !== req.user._id.toString()) return res.status(401).json({ error: "Unauthorized to delete post" });
+
+        if (post.img) {
+            const publicId = post.img.split("/").pop().split(".")[0];
+            await cloudinary.uploader.destroy(publicId);
+        }
 
         await Post.findByIdAndDelete(id);
         res.status(200).json({ message: "Post deleted successfully" });
@@ -127,7 +140,7 @@ const replyToPost = async (req, res) => {
         post.replies.push(reply);
         await post.save();
 
-        res.status(200).json({ message: "Reply added successfully", post });
+        res.status(200).json( post);
 
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -146,7 +159,7 @@ const getFeedPost = async (req, res) => {
 
         const feedPosts = await Post.find({postedBy: { $in : following }}).sort({ createdAt: -1 });
 
-        res.status(200).json(feedPosts );
+        res.status(200).json(feedPosts);
         
     } catch (err) {
         res.status(500).json({ error: err.message });
