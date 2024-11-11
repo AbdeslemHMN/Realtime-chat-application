@@ -10,6 +10,7 @@ import userAtom from "./atoms/userAtom";
 import UpdateProfilePage from "./pages/UpdateProfilePage";
 import CreatePost from "./components/CreatePost";
 import Error404 from "./pages/Error404";
+import SearchUser from "./components/SearchUser";
 
 function App() {
   const user = useRecoilValue(userAtom);
@@ -34,8 +35,10 @@ function App() {
           element={<UserPage />}
         />
         <Route path="/:username/post/:pid" element={<PostPage />} />
+        <Route path="/search" element={<SearchUser />} />
         <Route path="/*" element={<Error404 />} />
       </Routes>
+      
 
       {user && <CreatePost />}
     </Container>

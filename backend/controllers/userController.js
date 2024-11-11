@@ -1,14 +1,21 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 import { v2 as cloudinary } from "cloudinary";
 
 // @desc    Get a user profile 
 const getProfileUser = async (req, res) => {
-    const {username} = req.params
+    const {query} = req.params
    try {
-    const user = await User.findOne({username}).select("-password").select("-updatedAt");
+    let user 
+   if (mongoose.Types.ObjectId.isValid(query)) {
+    // query is userId
+         user = await User.findOne({_id: query}).select("-password").select("-updatedAt");
+   } else {
+    // query is username
+        user = await User.findOne({username: query}).select("-password").select("-updatedAt");
+    }
     if (!user) return res.status(400).json({error: "User not found"});
 
     res.status(200).json(user);

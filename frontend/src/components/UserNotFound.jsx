@@ -24,7 +24,7 @@ export default function UserNotFound() {
       User Not Found
       </Heading>
       <Text color={'gray.500'}>
-        please search an existing user
+        User doesn't exist
       </Text>
       <Flex justifyContent={"center"}>
         <Button 

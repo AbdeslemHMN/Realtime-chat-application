@@ -4,6 +4,7 @@ import userAtom from './../atoms/userAtom';
 import { AiFillHome  } from 'react-icons/ai';
 import { RxAvatar } from 'react-icons/rx';
 import { Link as RouterLink } from 'react-router-dom';
+import LougoutButton  from './LogoutButton';
 
 
 
@@ -13,10 +14,10 @@ export const Header = () => {
     const {colorMode , toggleColorMode} = useColorMode()
     const user = useRecoilValue(userAtom)
   return (
-    <Flex justifyContent={"space-between"} mt={6} mb='12'>
+    <Flex justifyContent={user ? "space-between" : "center"} mt={6} mb='12'>
       {user && 
      ( <Link as = {RouterLink} to = "/">
-        <AiFillHome size={24} />
+        <AiFillHome size={24} />  
         </Link>)
         }
         <Image 
@@ -31,6 +32,7 @@ export const Header = () => {
              <RxAvatar size={24} />
              </Link>)
              }
+             <LougoutButton />
     </Flex>
   )
 }

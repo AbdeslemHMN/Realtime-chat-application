@@ -45,7 +45,7 @@ const PostPage = () => {
         </Button>
     </Flex>
     <Divider my={4}/>
-    <Comment likes={58} comment={"thank you gays "} day={"5h"} avatar={"/zuck-avatar.png"} name={"Mark"}/>
+    <Comment likes={58} comment={"thank you guys "} day={"5h"} avatar={"/zuck-avatar.png"} name={"Mark"}/>
     <Comment likes={50} comment={"u are a hero man"} day={"23h"} avatar={"https://bit.ly/prosper-baba"} name={"Snowy"}/>
     <Comment likes={37} comment={"mete really prove a great thing"} day={"1d"} avatar={"https://bit.ly/kent-c-dodds"} name={"Kent Dodds"}/>
     </>
