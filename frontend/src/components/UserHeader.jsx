@@ -9,6 +9,8 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { Link as RouterLink, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { FiArrowLeft } from "react-icons/fi";
 import { Avatar } from "@chakra-ui/react";
 import { BsInstagram } from "react-icons/bs";
 import { CgMoreO } from "react-icons/cg";
@@ -21,9 +23,13 @@ import userAtom from "./../atoms/userAtom";
 const UserHeader = ({ user }) => {
   const toast = useToast();
   const currentUser = useRecoilValue(userAtom);
+  const navigate = useNavigate();
+  const handleNavigate = () => navigate("/");
+
   const { handleFollowUnfollow, updating, following } = useFollowUnfollow(user);
 
   const { colorMode } = useColorMode();
+
   const copyURL = () => {
     const currentURL = window.location.href;
     navigator.clipboard.writeText(currentURL).then(() => {
@@ -39,6 +45,15 @@ const UserHeader = ({ user }) => {
   return (
     <VStack gap={4} alignItems={"start"}>
       <Flex justifyContent={"space-between"} w={"full"}>
+        <Button
+          position={"fixed"}
+          top={"30px"}
+          left={"50px"}
+          size={"sm"}
+          onClick={handleNavigate}
+        >
+          <FiArrowLeft size={20} />
+        </Button>
         <Box>
           <Text
             fontSize={{ base: "lg", md: "xl", lg: "2xl" }}

@@ -17,7 +17,7 @@ const usePrevImg = () => {
           setImgUrl(null)
     };
     // console.log(imgUrl); // testing
-    return {handleImageChange, imgUrl} ;
+    return {handleImageChange, imgUrl , setImgUrl} ;
 }
 
 export default usePrevImg 

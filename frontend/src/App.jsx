@@ -9,6 +9,7 @@ import { useRecoilValue } from "recoil";
 import userAtom from "./atoms/userAtom";
 import UpdateProfilePage from "./pages/UpdateProfilePage";
 import Error404 from "./pages/Error404";
+import SearchUser from "./components/SearchUser";
 
 function App() {
   const user = useRecoilValue(userAtom);
@@ -28,13 +29,12 @@ function App() {
           path="/update"
           element={user ? <UpdateProfilePage /> : <Navigate to="/auth" />}
         />
-        <Route
-          path="/profile/:username"
-          element={<UserPage />}
-        />
+        <Route path="/profile/:username" element={<UserPage />} />
         <Route path="/:username/post/:pid" element={<PostPage />} />
+        <Route path="/search" element={<SearchUser />} />
         <Route path="/*" element={<Error404 />} />
       </Routes>
+
     </Container>
   );
 }

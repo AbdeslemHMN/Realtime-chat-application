@@ -1,21 +1,27 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 import { v2 as cloudinary } from "cloudinary";
 
 // @desc    Get a user profile 
 const getProfileUser = async (req, res) => {
-    const {username} = req.params
-   try {
-    const user = await User.findOne({username}).select("-password").select("-updatedAt");
-    if (!user) return res.status(400).json({error: "User not found"});
-
-    res.status(200).json(user);
-
-   } catch (err) {
-       res.status(500).json({ error: err.message });
-   } ;
+    const { query } = req.params
+    try {
+        let user
+        if (mongoose.Types.ObjectId.isValid(query)) {
+    // query is userId
+            user = await User.findOne({ _id: query }).select("-password").select("-updatedAt");
+        } else {
+    // query is username
+        user = await User.findOne({username: query}).select("-password").select("-updatedAt");
+    }
+        if (!user) return res.status(400).json({ error: "User not found" });
+        
+        res.status(200).json(user);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    };
 } ;
 
 
@@ -131,9 +137,7 @@ const followUnfollowUser = async (req, res) => {
         }
 
     } catch (err) {
-        res.status(500).json({ error: err.message });
-        console.log("Error in followUnfollowUser: ", err.message);
-        
+        res.status(500).json({ error: err.message });     
     }
 };
 
@@ -147,7 +151,7 @@ const updateUser = async (req, res) => {
     const userId = req.user._id;
 
     const promises = [];
-    const update = {};
+    const updates = {};
 
     try {
         let user = await User.findById(userId);
@@ -209,6 +213,70 @@ const updateUser = async (req, res) => {
         res.status(500).json({ error: err.message });
     } ; 
 } ;
+
+
+// // @desc    Update a user
+// const updateUser = async (req, res) => {
+//     const {name, email, username, password, confirm_password, bio} = req.body;
+//     let {profilePic} = req.body;
+//     const userId = req.user._id;
+
+//     try {
+//         let user = await User.findById(userId);
+//         if (!user) return res.status(400).json({error: "User not found"});
+
+//         if(req.params.id !== userId.toString()) return res.status(400).json({error: "You can only update your profile"});
+        
+//         if (password) {
+//             const minLength = 6;
+            
+//             if (password.length < minLength) return res.status(400).json({error: `Password must be at least ${minLength} characters long`});
+            
+//             if (password !== confirm_password) return res.status(400).json({error: "Passwords do not match"});
+//             const salt = await bcrypt.genSalt(10);
+//             const hashedPassword = await bcrypt.hash(password, salt);
+//             user.password = hashedPassword;
+//         }
+
+//         if(username) {
+//             const usernameExists = await User.findOne({username});
+//             if (username === user.username) return res.status(400).json({error: "You already use this username"});
+//             if (usernameExists) return res.status(400).json({error: "Username already exists"});
+//             user.username = username;
+//         }
+
+//         if(email) {
+//             const emailExists = await User.findOne({email});
+//             if (email === user.email) return res.status(400).json({error: "You already use this email"});
+//             if (emailExists) return res.status(400).json({error: "Email already exists"});
+//             user.email = email;
+//         }
+
+//         if(profilePic) {
+//             if(user.profilePic) {
+//                 await cloudinary.uploader.destroy(user.profilePic.split("/").pop().split(".")[0]);
+//             }
+//             const uploadedResponse = await cloudinary.uploader.upload(profilePic)
+//             profilePic = uploadedResponse.secure_url;
+//         }
+        
+//         user.name = name || user.name;
+//         user.bio = bio || user.bio;
+//         user.profilePic = profilePic|| user.profilePic
+        
+//         user = await user.save();
+
+//         user.password = null;
+
+//         res.status(200).json(user);
+        
+        
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//         console.log("Error in updateUser: ", err.message);
+//     } ;
+// } ;
+
 
 
 export { signupUser , loginUser, logoutUser, followUnfollowUser , updateUser , getProfileUser };

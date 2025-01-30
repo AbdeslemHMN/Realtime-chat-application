@@ -9,7 +9,7 @@ const useGetUserProfile = () => {
     const [loading , setLoading] = useState(true)
     const { username } = useParams()
     const toast = useShowToast()
-     useEffect( () => {
+    useEffect( () => {
     const getUser = async () => {
       try {
         const res = await fetch(`/api/users/profile/${username}`, { 

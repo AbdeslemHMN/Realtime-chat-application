@@ -21,19 +21,19 @@ const postSchema = new mongoose.Schema({
     } ,
     replies: [
         {
-           userId:{
+            userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
-           } ,
+            } ,
             text:{
                 type: String,
                 required: true,
-              },
-              userProfilePic: {
+            },
+            userProfilePic: {
                 type: String,
-              },
-            userName: {
+            },
+            username: {
                 type: String,
                 },
         }
