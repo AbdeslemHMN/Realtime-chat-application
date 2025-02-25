@@ -4,7 +4,11 @@ import connectDB from './db/connectDB.js';
 import cookieParser from 'cookie-parser';
 import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/postRoutes.js';
-import {v2 as cloudinary} from 'cloudinary';
+import messageRoutes from './routes/messageRoutes.js';
+import { v2 as cloudinary } from 'cloudinary';
+import swaggerUi from "swagger-ui-express";
+import fs from "fs";
+
 
 
 
@@ -15,6 +19,7 @@ connectDB();
 const app = express();
 
 const PORT = process.env.PORT || 5000;
+
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -28,7 +33,23 @@ app.use(cookieParser());
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/messages', messageRoutes);
+
+// Load Swagger JSON
+const swaggerFile = JSON.parse(fs.readFileSync("./swagger-output.json", "utf-8"));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile, {
+    swaggerOptions: {
+        authAction: {
+            bearerAuth: {
+                name: "Authorization",
+                schema: { type: "apiKey", in: "header", name: "Authorization" },
+                value: "Bearer YOUR_ACCESS_TOKEN", // You can replace it dynamically in the UI
+                },
+        },
+    },
+}));
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
     });
