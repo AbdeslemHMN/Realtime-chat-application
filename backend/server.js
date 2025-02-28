@@ -8,15 +8,12 @@ import messageRoutes from './routes/messageRoutes.js';
 import { v2 as cloudinary } from 'cloudinary';
 import swaggerUi from "swagger-ui-express";
 import fs from "fs";
-
-
+import { server, app } from './socket/socket.js';
 
 
 dotenv.config();
 
 connectDB();
-
-const app = express();
 
 const PORT = process.env.PORT || 5000;
 
@@ -49,7 +46,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile, {
     },
 }));
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
     console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
     });

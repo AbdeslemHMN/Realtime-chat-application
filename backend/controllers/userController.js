@@ -11,10 +11,10 @@ const getProfileUser = async (req, res) => {
         let user
         if (mongoose.Types.ObjectId.isValid(query)) {
     // query is userId
-            user = await User.findOne({ _id: query }).select("-password").select("-updatedAt");
+            user = await User.findOne({ _id: query , isFrozen: false }).select("-password").select("-updatedAt");
         } else {
     // query is username
-        user = await User.findOne({username: query}).select("-password").select("-updatedAt");
+        user = await User.findOne({username: query , isFrozen: false}).select("-password").select("-updatedAt");
     }
         if (!user) return res.status(400).json({ error: "User not found" });
         
@@ -80,8 +80,12 @@ const loginUser = async (req, res) => {
         const {username, password} = req.body;
         const user = await User.findOne({username});
         const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");
-        if(!user || !isPasswordCorrect)  return res.status(400).json({error: "Invalid username or password"});
-
+        if (!user || !isPasswordCorrect) return res.status(400).json({ error: "Invalid username or password" });
+        
+        if (user.isFrozen) {
+            user.isFrozen = false;
+            await user.save();
+        }
         generateTokenAndSetCookie(user._id, res);
 
         res.status(200).json({
@@ -214,4 +218,48 @@ const updateUser = async (req, res) => {
     } ; 
 } ;
 
-export { signupUser , loginUser, logoutUser, followUnfollowUser , updateUser , getProfileUser };
+const getSuggestedUsers = async (req, res) => {
+    try {
+        const userId = req.user?._id;
+        if (!mongoose.Types.ObjectId.isValid(userId)) return res.status(400).json({ error: "Invalid user ID" });
+        const usersFollowedByUser = await User.findById(userId).select("following");
+        const users = await User.aggregate([
+            {
+                $match: {
+                    _id: { $ne: userId } ,
+                    isFrozen: false
+                }
+            },
+                {
+                $sample: {
+                    size: 10
+                }
+            }
+        ]);
+        const filteredUsers = users.filter(user => !usersFollowedByUser.following.includes(user._id));
+        const suggestedUsers = filteredUsers.slice(0, 4).map(user => {
+            delete user.password
+            return user;
+        }
+        );
+        res.status(200).json(suggestedUsers);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+const freezeUser = async (req, res) => { 
+    try {
+        const userId = req.user?._id;
+        const user = await User.findById(userId);
+        if (!user) return res.status(400).json({ error: "User not found" });
+
+        user.isFrozen = true;
+        await user.save();
+        res.status(200).json({ message: "User frozen successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+export { signupUser , loginUser, logoutUser, followUnfollowUser , updateUser , getProfileUser , getSuggestedUsers , freezeUser };

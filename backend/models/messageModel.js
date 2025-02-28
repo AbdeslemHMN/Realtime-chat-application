@@ -5,7 +5,7 @@ const messageSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Conversation'
     },
-    groupeChatId: {
+    groupChatId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'GroupChat'
     },
@@ -26,6 +26,8 @@ const messageSchema = new mongoose.Schema({
 } ,
     { timeseries: true }
 );
+
+
 
 const Message = mongoose.model('message', messageSchema);
 

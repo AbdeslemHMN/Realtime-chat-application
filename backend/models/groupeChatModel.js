@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-
 const groupChatSchema = new mongoose.Schema({
     owner: {
         type: mongoose.Schema.Types.ObjectId,
@@ -38,3 +37,4 @@ const groupChatSchema = new mongoose.Schema({
 const GroupChat = mongoose.model('groupChat', groupChatSchema);
 
 export default GroupChat;
+

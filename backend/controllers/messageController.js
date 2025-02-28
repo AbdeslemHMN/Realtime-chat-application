@@ -3,7 +3,7 @@ import Conversation from "../models/conversationModel.js";
 import GroupChat from "../models/groupeChatModel.js";
 import mongoose from "mongoose";
 import { v2 as cloudinary } from 'cloudinary';
-
+import { getRecipientSocketId ,io } from "../socket/socket.js";
 
 
 async function sendMessage(req, res) {
@@ -62,6 +62,10 @@ async function sendMessage(req, res) {
                 })
             ]);
 
+            const recipientSocketId = getRecipientSocketId(recipientId);
+            if (recipientSocketId) {
+                io.to(recipientSocketId).emit("newMessage", newMessage);
+            } 
             return res.status(201).json({ message: "Message sent successfully" });
         }
         
@@ -137,7 +141,7 @@ const getConversations = async (req, res) => {
             conversations
             )
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message }); 
     }
 }
 
@@ -154,13 +158,18 @@ const getGroupChat = async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
-}
+} 
 
 const getMessages = async (req, res) => {
     try {
         const userId = req.user?._id;
         if (!mongoose.Types.ObjectId.isValid(userId)) return res.status(400).json({ error: "Invalid user ID" });
+
         const { otherUserId, groupeChatId } = req.params;
+
+        if ((otherUserId && groupeChatId) || (!otherUserId && !groupeChatId)) {
+            return res.status(400).json({ error: "Provide either otherUserId for direct message OR groupChatId for group message" });
+        }
         
         if (otherUserId) {
             if (!mongoose.Types.ObjectId.isValid(otherUserId)) return res.status(400).json({ error: "Invalid user ID" });
